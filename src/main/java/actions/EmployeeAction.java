@@ -8,6 +8,8 @@ import javax.servlet.ServletException;
 import constants.AttributeConst;
 import constants.ForwardConst;
 import constants.JpaConst;
+import constants.MessageConst;
+import constants.PropertyConst;
 import services.EmployeeService;
 import views.EmployeeView;
 
@@ -53,6 +55,46 @@ public class EmployeeAction extends ActionBase {
 	    putRequestScope(AttributeConst.EMPLOYEE, new EmployeeView());
 
 	    forward(ForwardConst.FW_EMP_NEW);
+	}
+
+	public void create() throws ServletException, IOException {
+
+
+	    if (checkToken()) {
+
+	        EmployeeView ev = new EmployeeView(
+	                null,
+	                getRequestParam(AttributeConst.EMP_CODE),
+	                getRequestParam(AttributeConst.EMP_NAME),
+	                getRequestParam(AttributeConst.EMP_PASS),
+	                toNumber(getRequestParam(AttributeConst.EMP_ADMIN_FLG)),
+	                null,
+	                null,
+	                AttributeConst.DEL_FLAG_FALSE.getIntegerValue());
+
+
+	        String pepper = getContextScope(PropertyConst.PEPPER);
+
+
+	        List<String> errors = service.create(ev, pepper);
+
+	        if (errors.size() > 0) {
+
+	            putRequestScope(AttributeConst.TOKEN, getTokenId());
+	            putRequestScope(AttributeConst.EMPLOYEE, ev);
+	            putRequestScope(AttributeConst.ERR, errors);
+
+
+	            forward(ForwardConst.FW_EMP_NEW);
+
+	        } else {
+
+	            putSessionScope(AttributeConst.FLUSH, MessageConst.I_REGISTERED.getMessage());
+
+	            redirect(ForwardConst.ACT_EMP, ForwardConst.CMD_INDEX);
+	        }
+
+	    }
 	}
 
 }
