@@ -76,7 +76,7 @@ public class ReportAction extends ActionBase {
 
 			ReportView rv = new ReportView(
 	                null,
-	                ev, 
+	                ev,
 	                day,
 	                getRequestParam(AttributeConst.REP_TITLE),
 	                getRequestParam(AttributeConst.REP_CONTENT),
@@ -97,6 +97,19 @@ public class ReportAction extends ActionBase {
 
 				redirect(ForwardConst.ACT_REP, ForwardConst.CMD_INDEX);
 			}
+
+		}
+	}
+
+	public void show() throws ServletException, IOException{
+		ReportView rv = service.findOne(toNumber(getRequestParam(AttributeConst.REP_ID)));
+
+
+		if (rv == null) {
+			forward(ForwardConst.FW_ERR_UNKNOWN);
+		}else {
+			putRequestScope(AttributeConst.REPORT, rv);
+			forward(ForwardConst.FW_REP_SHOW);
 
 		}
 	}
